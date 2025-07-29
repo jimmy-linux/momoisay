@@ -267,22 +267,40 @@ void construct_v2(const char **art[],char *argv[],int *intervals,int frames,int 
     }
 }
 
-void construct_freestyle(char *argv[],int length,int lines,int start,int end){
+void construct_v1_speed(const char **art[],char *argv[],int *intervals,int frames,int x,int y,int ry,int length,int lines,int start,int end,int round, float kintervals){
+  int *intervals_updated = (int*) malloc(frames * sizeof(int));
+
+  for (int i = 0; i < frames; ++i)
+    intervals_updated[i] = intervals[i] * kintervals;
+
+  construct_v1(art, argv, intervals_updated, frames, x, y, ry, length, lines, start, end, round);
+}
+
+void construct_v2_speed(const char **art[],char *argv[],int *intervals,int frames,int x,int y,int ry,int length,int lines,int start,int end,int reped,int repmin,int repmax,int round, float kintervals){
+  int *intervals_updated = (int*) malloc(frames * sizeof(int));
+
+  for (int i = 0; i < frames; ++i)
+    intervals_updated[i] = intervals[i] * kintervals;
+
+  construct_v2(art, argv, intervals_updated, frames, x, y, ry, length, lines, start, end, reped, repmin, repmax, round);
+}
+
+void construct_freestyle(char *argv[],int length,int lines,int start,int end,float kintervals){
     int select = randomizer(0,ANIMATED_VERSION-1);
     while(1){
         if(select==0){
             int frame[5] = {150000,75000,150000,150000,75000};
-            construct_v1(momoi_animated_v1,argv,frame,5,ANIMATED_V1_X,ANIMATED_V1_Y,ANIMATED_V1_RY,length,lines,start,end,randomizer(3,5));
+            construct_v1_speed(momoi_animated_v1,argv,frame,5,ANIMATED_V1_X,ANIMATED_V1_Y,ANIMATED_V1_RY,length,lines,start,end,randomizer(3,5),kintervals);
             select=2;
         }
         else if(select==1){
             int frame[7] = {70000,70000,70000,1500000,70000,70000,70000};
-            construct_v2(momoi_animated_v2,argv,frame,7,ANIMATED_V2_X,ANIMATED_V2_Y,ANIMATED_V2_RY,length,lines,start,end,1,5,13,randomizer(1,3));
+            construct_v2_speed(momoi_animated_v2,argv,frame,7,ANIMATED_V2_X,ANIMATED_V2_Y,ANIMATED_V2_RY,length,lines,start,end,1,5,13,randomizer(1,3),kintervals);
             select=randint((int []){0,2},2);
         }
         else if(select==2){
             int frame[8]={70000,70000,70000,70000,70000,70000,70000,70000};
-            construct_v1(momoi_animated_v3,argv,frame,8,ANIMATED_V3_X,ANIMATED_V3_Y,ANIMATED_V3_RY,length,lines,start,end,randomizer(3,5));
+            construct_v1_speed(momoi_animated_v3,argv,frame,8,ANIMATED_V3_X,ANIMATED_V3_Y,ANIMATED_V3_RY,length,lines,start,end,randomizer(3,5),kintervals);
             select=randint((int []){1},1);
         }
     }
@@ -297,6 +315,8 @@ int main(int argc,char *argv[]){
     int argctl = 0;
     int animated_version = 1;
     int static_version = 1;
+    int argi;
+    float kintervals = 1.0;
 
     struct option long_options[] = {
         {"help", no_argument, NULL, 'h'},
@@ -305,7 +325,7 @@ int main(int argc,char *argv[]){
         {NULL, 0, NULL, 0}
     };
 
-    while((option = getopt_long(argc,argv,"hvla::s::f::",long_options,NULL))!=-1){
+    while((option = getopt_long(argc,argv,"hvla::s::f::k:",long_options,NULL))!=-1){
         switch(option){
             case 'h':
                 help();
@@ -331,6 +351,11 @@ int main(int argc,char *argv[]){
                     argctl = 1;
                     animated_version = stoi(optarg);
                 }
+                break;
+            case 'k':
+                for (argi = 0; argv[argi][1] != 'k' && argi < argc; ++argi);
+                if (argi != argc)
+                  kintervals = atof(argv[++argi]);
                 break;
             case 's':
                 mode = 0;
@@ -362,7 +387,7 @@ int main(int argc,char *argv[]){
         if(length <= 5)length = 0;
         if(lines<=10){
             if(lines&1)lines++;
-            construct_freestyle(argv,length,lines,optind+argctl,argc);
+            construct_freestyle(argv,length,lines,optind+argctl,argc,kintervals);
             return 0;
         }
     }
@@ -375,7 +400,7 @@ int main(int argc,char *argv[]){
             if(lines<=30){
                 if(lines&1)lines++;
                 int frame[5] = {150000,75000,150000,150000,75000};
-                construct_v1(momoi_animated_v1,argv,frame,5,ANIMATED_V1_X,ANIMATED_V1_Y,ANIMATED_V1_RY,length,lines,optind+argctl,argc,-1);
+                construct_v1_speed(momoi_animated_v1,argv,frame,5,ANIMATED_V1_X,ANIMATED_V1_Y,ANIMATED_V1_RY,length,lines,optind+argctl,argc,-1,kintervals);
             }
         }
         else if(animated_version==2){
@@ -383,7 +408,7 @@ int main(int argc,char *argv[]){
             if(lines<=30){
                 if(lines&1)lines++;
                 int frame[7] = {70000,70000,70000,1500000,70000,70000,70000};
-                construct_v2(momoi_animated_v2,argv,frame,7,ANIMATED_V2_X,ANIMATED_V2_Y,ANIMATED_V2_RY,length,lines,optind+argctl,argc,1,5,13,-1);
+                construct_v2_speed(momoi_animated_v2,argv,frame,7,ANIMATED_V2_X,ANIMATED_V2_Y,ANIMATED_V2_RY,length,lines,optind+argctl,argc,1,5,13,-1,kintervals);
             }
         }
         else if(animated_version==3){
@@ -391,7 +416,7 @@ int main(int argc,char *argv[]){
             if(lines<=30){
                 if(lines&1)lines++;
                 int frame[8]={70000,70000,70000,70000,70000,70000,70000,70000};
-                construct_v1(momoi_animated_v3,argv,frame,8,ANIMATED_V3_X,ANIMATED_V3_Y,ANIMATED_V3_RY,length,lines,optind+argctl,argc,-1);
+                construct_v1_speed(momoi_animated_v3,argv,frame,8,ANIMATED_V3_X,ANIMATED_V3_Y,ANIMATED_V3_RY,length,lines,optind+argctl,argc,-1,kintervals);
             }
 
         }
@@ -405,7 +430,7 @@ int main(int argc,char *argv[]){
             if(lines<=10){
                 if(lines&1)lines++;
                 int frame[1] = {75000};
-                construct_v1(momoi_static_v1,argv,frame,1,STATIC_V1_X,STATIC_V1_Y,STATIC_V1_RY,length,lines,optind+argctl,argc,-1);
+                construct_v1_speed(momoi_static_v1,argv,frame,1,STATIC_V1_X,STATIC_V1_Y,STATIC_V1_RY,length,lines,optind+argctl,argc,-1,kintervals);
                 return 0;
             }
         }

@@ -24,19 +24,19 @@ Sometimes the precompiled binaries are not the latest version as the release. If
 
 ### Linux
 ```bash
-git clone https://github.com/Mon4sm/Momoisay.git
+git clone https://github.com/jimmy-linux/Momoisay.git
 cd Momoisay
 sudo sh ./install/linux.sh
 ```
 ### MacOS
 ```bash
-git clone https://github.com/Mon4sm/Momoisay.git
+git clone https://github.com/jimmy-linux/Momoisay.git
 cd Momoisay
 sudo sh ./install/mac.sh
 ```
 ### Build from source (Latest Version)
 ```bash
-git clone https://github.com/Mon4sm/Momoisay.git
+git clone https://github.com/jimmy-linux/Momoisay.git
 cd Momoisay
 make
 ```
@@ -48,6 +48,8 @@ momoisay <text>         # Simple Usage
 momoisay -a             # Animated Momoi with no text bubble (default version 1)
 momoisay -a <version>   # Animated Momoi with no text bubble (default version 1)
 momoisay -f             # Freestyle animations (This is pretty cool for ricing)
+momoisay -a -k 0.2      # Set frame change delay multiplier to 0.2 (run 5 times
+                        # faster)
 ```
 
 ## File Structure
